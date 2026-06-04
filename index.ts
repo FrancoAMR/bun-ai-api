@@ -10,6 +10,7 @@ const services: AIService[] = [
 ]
 let currentServiceIndex = 0;
 
+// Rotate providers per request to spread traffic across available backends.
 function getNextService(){
     const service = services[currentServiceIndex];
     currentServiceIndex = (currentServiceIndex + 1) % services.length;
@@ -30,7 +31,8 @@ const server = Bun.serve({
             
             return new Response(stream,{
                 headers: {
-                    'Content-Type': 'text/event-stream',
+                    // The stream yields raw text chunks, not SSE data frames.
+                    'Content-Type': 'text/event-stream; charset=utf-8',
                     'Cache-Control': 'no-cache',
                     'Connection': 'keep-alive',
                 }

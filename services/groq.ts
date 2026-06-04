@@ -24,7 +24,7 @@ export const groqService: AIService = {
         messages,
         model: "qwen/qwen3-32b",
         temperature: 0.6,
-        max_completion_tokens: 4096,
+        max_completion_tokens: 1200,
         top_p: 0.95,
         stream: true,
         reasoning_effort: "default",

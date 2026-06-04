@@ -9,7 +9,7 @@ export const openrouterService: AIService = {
         const stream = await openrouter.chat.send({
             chatRequest: {
                 messages: messages as any,
-                model: 'nvidia/nemotron-3-ultra-550b-a55b:free',
+                model: 'meta-llama/llama-3.3-70b-instruct:free',
                 stream: true
             }
         });

@@ -9,11 +9,31 @@ const services: AIService[] = [
     openrouterService,
 ]
 let currentServiceIndex = 0;
+const servicesBySession = new Map<string, AIService>();
 
 // Rotate providers per request to spread traffic across available backends.
-function getNextService(){
+function getNextService(): AIService {
+    if (services.length === 0) {
+        throw new Error('No AI services configured');
+    }
+
     const service = services[currentServiceIndex];
     currentServiceIndex = (currentServiceIndex + 1) % services.length;
+    return service ?? services[0]!;
+}
+
+function getService(sessionId?: string): AIService {
+    if (!sessionId) {
+        return getNextService();
+    }
+
+    const existingService = servicesBySession.get(sessionId);
+    if (existingService) {
+        return existingService;
+    }
+
+    const service = getNextService();
+    servicesBySession.set(sessionId, service);
     return service;
 }
 
@@ -23,8 +43,8 @@ const server = Bun.serve({
         const {pathname} = new URL(req.url)
 
         if(req.method === 'POST' && pathname === '/chat'){
-            const {messages} = await req.json() as {messages: ChatMessage[]};
-            const service = getNextService();
+            const {messages, sessionId} = await req.json() as {messages: ChatMessage[], sessionId?: string};
+            const service = getService(sessionId);
 
             console.log(`Using service: ${service?.name} service`);
             const stream = await service?.chat(messages);

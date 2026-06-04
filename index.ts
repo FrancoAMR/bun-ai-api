@@ -11,7 +11,7 @@ const services: AIService[] = [
 let currentServiceIndex = 0;
 const servicesBySession = new Map<string, AIService>();
 
-// Rotate providers per request to spread traffic across available backends.
+// Rotate provider assignments unless the caller explicitly pins a session.
 function getNextService(): AIService {
     if (services.length === 0) {
         throw new Error('No AI services configured');
